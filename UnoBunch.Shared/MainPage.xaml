@@ -10,26 +10,29 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <ScrollViewer>
-            <ListView ItemsSource="{x:Bind Items}">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="model:Cat">
-                        <Grid Margin="10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Image Source="{Binding PrincipalImage}" Width="200" Height="200" 
-                               HorizontalAlignment="Left"/>
-                            <StackPanel Grid.Column="1" Orientation="Vertical">
-                                <TextBlock Text="{x:Bind Name}" Foreground="Teal" 
-                                       FontSize="18" Padding="10"/>
-                                <TextBlock Text="{x:Bind Description}" Padding="10"
-                                       FontSize="14" TextWrapping="Wrap" />
-                            </StackPanel>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+            <StackPanel Orientation="Vertical">
+                <ListView ItemsSource="{x:Bind Items}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Cat">
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{Binding PrincipalImage}" Width="200" Height="200" 
+                                           HorizontalAlignment="Left"/>
+                                <StackPanel Grid.Column="1" Orientation="Vertical">
+                                    <TextBlock Text="{x:Bind Name}" Foreground="Teal" 
+                                                   FontSize="18" Padding="10"/>
+                                    <TextBlock Text="{x:Bind Description}" Padding="10"
+                                                   FontSize="14" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Button Content="Load More" Click="LoadMore_Click"/>
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </Page>

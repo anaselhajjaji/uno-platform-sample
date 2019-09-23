@@ -47,7 +47,12 @@ namespace UnoBunch
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-           await Populate();
+            await Populate();
+        }
+
+        private async void LoadMore_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadItems();
         }
     }
 }
