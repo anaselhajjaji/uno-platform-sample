@@ -1,8 +1,10 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using UnoBench.Model.Data.Entity;
 using UnoBench.Model.Data.Net;
 using UnoBench.Model.Data.Repository;
 using UnoBench.Model.Domain;
@@ -12,20 +14,34 @@ namespace UnoBench.Model.Data.Repository
     public class CatsRepository : ICatsRepository
     {
         readonly ICatsApi catsAPI;
+        IMapper mapper;
 
         public CatsRepository(ICatsApi catsAPI)
         {
+            InitializeAutomapper();
             this.catsAPI = catsAPI;
+        }
+
+        void InitializeAutomapper()
+        {
+            var configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<CatEntity, Cat>();
+                cfg.CreateMap<CatImageEntity, CatImage>();
+            });
+            mapper = configuration.CreateMapper();
         }
 
         public async Task<ObservableCollection<Cat>> FetchCats(int page, int limit)
         {
-            return await catsAPI?.FetchCats(page, limit);
+            ObservableCollection<CatEntity> cats = await catsAPI?.FetchCats(page, limit);
+            return new ObservableCollection<Cat>(cats?.Select(x => mapper.Map<CatEntity, Cat>(x)));
         }
 
         public async Task<List<CatImage>> FetchCatImages(string catId, int page, int limit)
         {
-            return await catsAPI?.FetchCatImages(catId, page, limit);
+            List<CatImageEntity> catImages = await catsAPI?.FetchCatImages(catId, page, limit);
+            return new List<CatImage>(catImages?.Select(x => mapper.Map<CatImageEntity, CatImage>(x)));
         }
 
         public async Task<ObservableCollection<Cat>> Populate(int page, int pageSize)

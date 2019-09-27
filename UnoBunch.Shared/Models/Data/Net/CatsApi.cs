@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
-using UnoBench.Model.Domain;
+using UnoBench.Model.Data.Entity;
+using UnoBench.Model.Data.Net;
 using Newtonsoft.Json;
-using System.Net.Http.Headers;
-using System.Net;
+using Refit;
 
 namespace UnoBench.Model.Data.Net
 {
@@ -14,59 +15,28 @@ namespace UnoBench.Model.Data.Net
     {
         const string API_URL = "https://api.thecatapi.com/v1";
 
-        private static HttpClient CreateHttp()
+        private readonly HttpClient _httpClient;
+        private readonly ICatsApi _theCatsApi;
+
+        public CatsApi()
         {
 #if __WASM__
-            var handler = new Uno.UI.Wasm.WasmHttpHandler();
-			var httpClient = new HttpClient(handler);
+            var innerHandler = new Uno.UI.Wasm.WasmHttpHandler();
 #else
-            var httpClient = new HttpClient();
-
+            var innerHandler = new HttpClientHandler();
 #endif
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/json"));
-            httpClient.DefaultRequestHeaders.Add("x-api-key", "cac1a061-43b7-4e5a-975f-a1d77e135ef4");
-            return httpClient;
+            _httpClient = new HttpClient(innerHandler) { BaseAddress = new Uri(API_URL) };
+            _theCatsApi = RestService.For<ICatsApi>(_httpClient);
         }
 
-        public async Task<ObservableCollection<Cat>> FetchCats(int page, int limit)
+        public async Task<ObservableCollection<CatEntity>> FetchCats(int page, int limit)
         {
-            using (var client = CreateHttp())
-            {
-                var url = $"https://api.thecatapi.com/v1/breeds?page={page}&limit={limit}";
-
-                var response = await client.GetAsync(url);
-
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    var responsePayload = await response.Content.ReadAsStringAsync();
-                    return await Task.Run(() => {
-                        return JsonConvert.DeserializeObject<ObservableCollection<Cat>>(responsePayload);
-                     });
-                }
-
-                return new ObservableCollection<Cat>();
-            }
+            return await _theCatsApi.FetchCats(page, limit);
          }
 
-        public async Task<List<CatImage>> FetchCatImages(string catId, int page, int limit)
+        public async Task<List<CatImageEntity>> FetchCatImages(string catId, int page, int limit)
         {
-            using (var client = CreateHttp())
-            {
-                var url = $"https://api.thecatapi.com/v1/images/search?breed_id={catId}&page={page}&limit={limit}";
-
-                var response = await client.GetAsync(url);
-
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    var responsePayload = await response.Content.ReadAsStringAsync();
-                    return await Task.Run(() => {
-                        return JsonConvert.DeserializeObject<List<CatImage>>(responsePayload);
-                    });
-                }
-
-                return new List<CatImage>();
-            }
+            return await _theCatsApi.FetchCatImages(catId, page, limit);
         }
     }
 }

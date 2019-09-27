@@ -7,4 +7,6 @@
 	<type fullname="System.Linq.Expressions*" />
   </assembly>
   <assembly fullname="Newtonsoft.Json" />
+  <assembly fullname="Refit" />
+  <assembly fullname="AutoMapper" />
 </linker>
